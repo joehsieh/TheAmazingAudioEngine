@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		39FD3BE91B5E4C3500096FAA /* AEStreamingChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = 39FD3BE81B5E4C3500096FAA /* AEStreamingChannel.m */; };
+		39FD3BED1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 39FD3BEC1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m */; };
 		4C09450A170001660054608E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C094506170001660054608E /* Default-568h@2x.png */; };
 		4C09450B170001660054608E /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C094507170001660054608E /* Default.png */; };
 		4C09450C170001660054608E /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C094508170001660054608E /* Default@2x.png */; };
@@ -59,6 +61,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		39FD3BE71B5E4C3500096FAA /* AEStreamingChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AEStreamingChannel.h; path = ../AEStreamingChannel.h; sourceTree = "<group>"; };
+		39FD3BE81B5E4C3500096FAA /* AEStreamingChannel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AEStreamingChannel.m; path = ../AEStreamingChannel.m; sourceTree = "<group>"; };
+		39FD3BEB1B5E546600096FAA /* AEAudioStreamingLoaderOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEAudioStreamingLoaderOperation.h; sourceTree = "<group>"; };
+		39FD3BEC1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AEAudioStreamingLoaderOperation.m; sourceTree = "<group>"; };
 		4C094506170001660054608E /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "Resources/Default-568h@2x.png"; sourceTree = "<group>"; };
 		4C094507170001660054608E /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = Resources/Default.png; sourceTree = "<group>"; };
 		4C094508170001660054608E /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "Resources/Default@2x.png"; sourceTree = "<group>"; };
@@ -126,6 +132,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		39FD3BEA1B5E544500096FAA /* Streaming */ = {
+			isa = PBXGroup;
+			children = (
+				39FD3BE71B5E4C3500096FAA /* AEStreamingChannel.h */,
+				39FD3BE81B5E4C3500096FAA /* AEStreamingChannel.m */,
+				39FD3BEB1B5E546600096FAA /* AEAudioStreamingLoaderOperation.h */,
+				39FD3BEC1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m */,
+			);
+			name = Streaming;
+			sourceTree = "<group>";
+		};
 		4C0C247A1599FADD00D23E13 = {
 			isa = PBXGroup;
 			children = (
@@ -161,6 +178,7 @@
 		4C0C248F1599FADD00D23E13 /* TheEngineSample */ = {
 			isa = PBXGroup;
 			children = (
+				39FD3BEA1B5E544500096FAA /* Streaming */,
 				4C0C24981599FADD00D23E13 /* AppDelegate.h */,
 				4C0C24991599FADD00D23E13 /* AppDelegate.m */,
 				4C0C249B1599FADD00D23E13 /* ViewController.h */,
@@ -335,10 +353,12 @@
 				4C0C24961599FADD00D23E13 /* main.m in Sources */,
 				4C0C249A1599FADD00D23E13 /* AppDelegate.m in Sources */,
 				4C0C249D1599FADD00D23E13 /* ViewController.m in Sources */,
+				39FD3BE91B5E4C3500096FAA /* AEStreamingChannel.m in Sources */,
 				4C0C24CC159A246500D23E13 /* TPOscilloscopeLayer.m in Sources */,
 				4C7C680916F1609800721E60 /* AEExpanderFilter.m in Sources */,
 				4C7C680A16F1609800721E60 /* AELimiter.m in Sources */,
 				4C7C680B16F1609800721E60 /* AELimiterFilter.m in Sources */,
+				39FD3BED1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m in Sources */,
 				4C7C680C16F1609800721E60 /* AEMixerBuffer.m in Sources */,
 				4C7C680D16F1609800721E60 /* AEPlaythroughChannel.m in Sources */,
 				4C7C680E16F1609800721E60 /* AERecorder.m in Sources */,

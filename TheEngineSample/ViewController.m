@@ -15,6 +15,8 @@
 #import "AERecorder.h"
 #import <QuartzCore/QuartzCore.h>
 
+#import "AEStreamingChannel.h"
+
 #define checkResult(result,operation) (_checkResult((result),(operation),strrchr(__FILE__, '/')+1,__LINE__))
 static inline BOOL _checkResult(OSStatus result, const char *operation, const char* file, int line) {
     if ( result != noErr ) {
@@ -56,6 +58,7 @@ static const int kInputChannelsChangedContext;
 @property (nonatomic, strong) UIButton *playButton;
 @property (nonatomic, strong) UIButton *oneshotButton;
 @property (nonatomic, strong) UIButton *oneshotAudioUnitButton;
+@property (nonatomic, strong) AEStreamingChannel *streamingChannel;
 @end
 
 @implementation ViewController
@@ -117,7 +120,11 @@ static const int kInputChannelsChangedContext;
     [_audioController addChannels:@[_audioUnitPlayer]];
     
     [_audioController addObserver:self forKeyPath:@"numberOfInputChannels" options:0 context:(void*)&kInputChannelsChangedContext];
-    
+
+	// streaming
+	AEStreamingChannel *streamingChannel = [[AEStreamingChannel alloc] initWithAudioController:_audioController];
+	self.streamingChannel = streamingChannel;
+	[_audioController addChannels:@[streamingChannel]];
     return self;
 }
 
@@ -236,7 +243,7 @@ static const int kInputChannelsChangedContext;
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch ( section ) {
         case 0:
-            return 4;
+            return 5;
             
         case 1:
             return 2;
@@ -309,9 +316,17 @@ static const int kInputChannelsChangedContext;
                     [slider addTarget:self action:@selector(channelGroupVolumeChanged:) forControlEvents:UIControlEventValueChanged];
                     break;
                 }
+				case 4: {
+					cell.textLabel.text = @"Streaming";
+					((UISwitch*)cell.accessoryView).on = !_streamingChannel.channelIsMuted;
+					slider.value = _streamingChannel.volume;
+					[((UISwitch*)cell.accessoryView) addTarget:self action:@selector(streamingSwitchChanged:) forControlEvents:UIControlEventValueChanged];
+					[slider addTarget:self action:@selector(streamingVolumeChanged:) forControlEvents:UIControlEventValueChanged];
+					break;
+				}
             }
             break;
-        } 
+        }
         case 1: {
             switch ( indexPath.row ) {
                 case 0: {
@@ -457,6 +472,16 @@ static const int kInputChannelsChangedContext;
 
 - (void)channelGroupVolumeChanged:(UISlider*)sender {
     [_audioController setVolume:sender.value forChannelGroup:_group];
+}
+
+- (void)streamingSwitchChanged:(UISwitch*)sender
+{
+	_streamingChannel.volume = sender.isOn;
+}
+
+- (void)streamingVolumeChanged:(UISlider*)sender
+{
+	_streamingChannel.volume = sender.value;
 }
 
 - (void)oneshotPlayButtonPressed:(UIButton*)sender {
