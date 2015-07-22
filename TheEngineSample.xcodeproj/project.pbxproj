@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		39F8BB4B1B5F688F0045116F /* NJPacketArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 39F8BB4A1B5F688F0045116F /* NJPacketArray.m */; };
 		39FD3BE91B5E4C3500096FAA /* AEStreamingChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = 39FD3BE81B5E4C3500096FAA /* AEStreamingChannel.m */; };
 		39FD3BED1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 39FD3BEC1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m */; };
 		4C09450A170001660054608E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C094506170001660054608E /* Default-568h@2x.png */; };
@@ -61,6 +62,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		39F8BB491B5F688F0045116F /* NJPacketArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NJPacketArray.h; sourceTree = "<group>"; };
+		39F8BB4A1B5F688F0045116F /* NJPacketArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NJPacketArray.m; sourceTree = "<group>"; };
 		39FD3BE71B5E4C3500096FAA /* AEStreamingChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AEStreamingChannel.h; path = ../AEStreamingChannel.h; sourceTree = "<group>"; };
 		39FD3BE81B5E4C3500096FAA /* AEStreamingChannel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AEStreamingChannel.m; path = ../AEStreamingChannel.m; sourceTree = "<group>"; };
 		39FD3BEB1B5E546600096FAA /* AEAudioStreamingLoaderOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEAudioStreamingLoaderOperation.h; sourceTree = "<group>"; };
@@ -135,6 +138,8 @@
 		39FD3BEA1B5E544500096FAA /* Streaming */ = {
 			isa = PBXGroup;
 			children = (
+				39F8BB491B5F688F0045116F /* NJPacketArray.h */,
+				39F8BB4A1B5F688F0045116F /* NJPacketArray.m */,
 				39FD3BE71B5E4C3500096FAA /* AEStreamingChannel.h */,
 				39FD3BE81B5E4C3500096FAA /* AEStreamingChannel.m */,
 				39FD3BEB1B5E546600096FAA /* AEAudioStreamingLoaderOperation.h */,
@@ -358,6 +363,7 @@
 				4C7C680916F1609800721E60 /* AEExpanderFilter.m in Sources */,
 				4C7C680A16F1609800721E60 /* AELimiter.m in Sources */,
 				4C7C680B16F1609800721E60 /* AELimiterFilter.m in Sources */,
+				39F8BB4B1B5F688F0045116F /* NJPacketArray.m in Sources */,
 				39FD3BED1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m in Sources */,
 				4C7C680C16F1609800721E60 /* AEMixerBuffer.m in Sources */,
 				4C7C680D16F1609800721E60 /* AEPlaythroughChannel.m in Sources */,
@@ -393,6 +399,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -429,6 +436,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;

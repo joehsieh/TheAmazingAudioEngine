@@ -122,7 +122,8 @@ static const int kInputChannelsChangedContext;
     [_audioController addObserver:self forKeyPath:@"numberOfInputChannels" options:0 context:(void*)&kInputChannelsChangedContext];
 
 	// streaming
-	AEStreamingChannel *streamingChannel = [[AEStreamingChannel alloc] initWithAudioController:_audioController];
+	NSURL *url = [NSURL URLWithString:@"http://zonble.net/MIDI/orz.mp3"];
+	AEStreamingChannel *streamingChannel = [AEStreamingChannel audioFilePlayerWithURL:url audioController:_audioController error:nil];
 	self.streamingChannel = streamingChannel;
 	[_audioController addChannels:@[streamingChannel]];
     return self;
