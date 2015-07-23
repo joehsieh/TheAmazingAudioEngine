@@ -9,7 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "TheAmazingAudioEngine.h"
 
-@interface AEStreamingChannel : NSObject <AEAudioPlayable>
+
+/* TODO
+	- Shows alert when error occurred.
+	- Checks threads which running these code.
+    - Profile
+ */
+
+@interface AEStreamingPlayer : NSObject <AEAudioPlayable>
 /*!
  * Initialise
  *
@@ -18,8 +25,6 @@
 + (id)audioFilePlayerWithURL:(NSURL*)url audioController:(AEAudioController*)audioController error:(NSError**)error;
 
 @property (nonatomic, strong, readonly) NSURL *url;         //!< Original media URL
-@property (nonatomic, readonly) NSTimeInterval duration;    //!< Length of audio, in seconds
-@property (nonatomic, assign) NSTimeInterval currentTime;   //!< Current playback position, in seconds
 @property (nonatomic, readwrite) BOOL loop;                 //!< Whether to loop this track
 @property (nonatomic, readwrite) float volume;              //!< Track volume
 @property (nonatomic, readwrite) float pan;                 //!< Track pan
@@ -28,4 +33,5 @@
 @property (nonatomic, readwrite) BOOL removeUponFinish;     //!< Whether the track automatically removes itself from the audio controller after playback completes
 @property (nonatomic, copy) void(^completionBlock)();       //!< A block to be called when playback finishes
 @property (nonatomic, copy) void(^startLoopBlock)();        //!< A block to be called when the loop restarts in loop mode
+- (void)replay;
 @end

@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		39F8BB4B1B5F688F0045116F /* NJPacketArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 39F8BB4A1B5F688F0045116F /* NJPacketArray.m */; };
-		39FD3BE91B5E4C3500096FAA /* AEStreamingChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = 39FD3BE81B5E4C3500096FAA /* AEStreamingChannel.m */; };
+		39FD3BE91B5E4C3500096FAA /* AEStreamingPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 39FD3BE81B5E4C3500096FAA /* AEStreamingPlayer.m */; };
 		39FD3BED1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 39FD3BEC1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m */; };
 		4C09450A170001660054608E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C094506170001660054608E /* Default-568h@2x.png */; };
 		4C09450B170001660054608E /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 4C094507170001660054608E /* Default.png */; };
@@ -64,8 +64,8 @@
 /* Begin PBXFileReference section */
 		39F8BB491B5F688F0045116F /* NJPacketArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NJPacketArray.h; sourceTree = "<group>"; };
 		39F8BB4A1B5F688F0045116F /* NJPacketArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NJPacketArray.m; sourceTree = "<group>"; };
-		39FD3BE71B5E4C3500096FAA /* AEStreamingChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AEStreamingChannel.h; path = ../AEStreamingChannel.h; sourceTree = "<group>"; };
-		39FD3BE81B5E4C3500096FAA /* AEStreamingChannel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AEStreamingChannel.m; path = ../AEStreamingChannel.m; sourceTree = "<group>"; };
+		39FD3BE71B5E4C3500096FAA /* AEStreamingPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AEStreamingPlayer.h; path = ../AEStreamingPlayer.h; sourceTree = "<group>"; };
+		39FD3BE81B5E4C3500096FAA /* AEStreamingPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AEStreamingPlayer.m; path = ../AEStreamingPlayer.m; sourceTree = "<group>"; };
 		39FD3BEB1B5E546600096FAA /* AEAudioStreamingLoaderOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AEAudioStreamingLoaderOperation.h; sourceTree = "<group>"; };
 		39FD3BEC1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AEAudioStreamingLoaderOperation.m; sourceTree = "<group>"; };
 		4C094506170001660054608E /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "Resources/Default-568h@2x.png"; sourceTree = "<group>"; };
@@ -140,8 +140,8 @@
 			children = (
 				39F8BB491B5F688F0045116F /* NJPacketArray.h */,
 				39F8BB4A1B5F688F0045116F /* NJPacketArray.m */,
-				39FD3BE71B5E4C3500096FAA /* AEStreamingChannel.h */,
-				39FD3BE81B5E4C3500096FAA /* AEStreamingChannel.m */,
+				39FD3BE71B5E4C3500096FAA /* AEStreamingPlayer.h */,
+				39FD3BE81B5E4C3500096FAA /* AEStreamingPlayer.m */,
 				39FD3BEB1B5E546600096FAA /* AEAudioStreamingLoaderOperation.h */,
 				39FD3BEC1B5E546600096FAA /* AEAudioStreamingLoaderOperation.m */,
 			);
@@ -358,7 +358,7 @@
 				4C0C24961599FADD00D23E13 /* main.m in Sources */,
 				4C0C249A1599FADD00D23E13 /* AppDelegate.m in Sources */,
 				4C0C249D1599FADD00D23E13 /* ViewController.m in Sources */,
-				39FD3BE91B5E4C3500096FAA /* AEStreamingChannel.m in Sources */,
+				39FD3BE91B5E4C3500096FAA /* AEStreamingPlayer.m in Sources */,
 				4C0C24CC159A246500D23E13 /* TPOscilloscopeLayer.m in Sources */,
 				4C7C680916F1609800721E60 /* AEExpanderFilter.m in Sources */,
 				4C7C680A16F1609800721E60 /* AELimiter.m in Sources */,

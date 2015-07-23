@@ -6,6 +6,10 @@
 //  Copyright (c) 2014年 NJ. All rights reserved.
 //
 
+/*
+ Renames this class
+ */
+
 @import Foundation;
 @import AudioToolbox;
 
@@ -15,6 +19,9 @@ typedef struct {
 } NJAudioPacketInfo;
 
 @interface NJPacketArray : NSObject
+- (void)reset;
 - (void)storePacket:(NJAudioPacketInfo *)packetInfo;
 - (NJAudioPacketInfo *)readNextPacket;
+@property (nonatomic, assign, readonly) BOOL hasPacketsToPlay;
+@property (nonatomic, assign, readonly) NSUInteger packetReadIndex;
 @end

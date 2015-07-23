@@ -15,7 +15,7 @@
 #import "AERecorder.h"
 #import <QuartzCore/QuartzCore.h>
 
-#import "AEStreamingChannel.h"
+#import "AEStreamingPlayer.h"
 
 #define checkResult(result,operation) (_checkResult((result),(operation),strrchr(__FILE__, '/')+1,__LINE__))
 static inline BOOL _checkResult(OSStatus result, const char *operation, const char* file, int line) {
@@ -58,7 +58,7 @@ static const int kInputChannelsChangedContext;
 @property (nonatomic, strong) UIButton *playButton;
 @property (nonatomic, strong) UIButton *oneshotButton;
 @property (nonatomic, strong) UIButton *oneshotAudioUnitButton;
-@property (nonatomic, strong) AEStreamingChannel *streamingChannel;
+@property (nonatomic, strong) AEStreamingPlayer *streamingChannel;
 @end
 
 @implementation ViewController
@@ -123,7 +123,13 @@ static const int kInputChannelsChangedContext;
 
 	// streaming
 	NSURL *url = [NSURL URLWithString:@"http://zonble.net/MIDI/orz.mp3"];
-	AEStreamingChannel *streamingChannel = [AEStreamingChannel audioFilePlayerWithURL:url audioController:_audioController error:nil];
+	AEStreamingPlayer *streamingChannel = [AEStreamingPlayer audioFilePlayerWithURL:url audioController:_audioController error:nil];
+	streamingChannel.channelIsMuted = YES;
+	streamingChannel.loop = YES;
+//	__weak AEStreamingPlayer *weakStreamingChannel = streamingChannel;
+//	streamingChannel.startLoopBlock = ^{
+//		[weakStreamingChannel replay];
+//	};
 	self.streamingChannel = streamingChannel;
 	[_audioController addChannels:@[streamingChannel]];
     return self;
@@ -477,7 +483,7 @@ static const int kInputChannelsChangedContext;
 
 - (void)streamingSwitchChanged:(UISwitch*)sender
 {
-	_streamingChannel.volume = sender.isOn;
+	_streamingChannel.channelIsMuted = !sender.isOn;
 }
 
 - (void)streamingVolumeChanged:(UISlider*)sender

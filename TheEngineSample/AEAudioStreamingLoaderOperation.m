@@ -34,13 +34,6 @@ void parserDidParsePacket (
 						   AudioStreamPacketDescription  *inPacketDescriptions
 						   );
 
-OSStatus NJAURenderCallback(void *							inRefCon,
-							AudioUnitRenderActionFlags *	ioActionFlags,
-							const AudioTimeStamp *			inTimeStamp,
-							UInt32							inBusNumber,
-							UInt32							inNumberFrames,
-							AudioBufferList *				ioData);
-
 OSStatus NJFillRawPacketData(AudioConverterRef               inAudioConverter,
 							 UInt32*                         ioNumberDataPackets,
 							 AudioBufferList*                ioData,
@@ -53,18 +46,12 @@ OSStatus NJFillRawPacketData(AudioConverterRef               inAudioConverter,
 
 @property (nonatomic, assign) AudioFileStreamID audioFileStreamID; // file stream parser
 @property (nonatomic, assign) AudioConverterRef converter; // converter
+@property (nonatomic, assign) AudioStreamBasicDescription asbdFromAudioStreaming;
 @property (nonatomic, strong) NJPacketArray *packetArray;
 
 @property (nonatomic, assign) AudioBufferList *bufferList;
-@property (nonatomic, readwrite) UInt32 lengthInFrames;
-@property (nonatomic, strong, readwrite) NSError *error;
-/*!
- Part of audio streaming is parsed calls didParsePackets
- */
-@property (nonatomic, copy) void(^didParseEnoughPacketsToPlay)();
-
-@property (nonatomic, copy) void(^didFetchAllAudioData)(NSError *inError);
-@property (nonatomic, assign, readwrite) BOOL enoughDataToPlay;
+@property (nonatomic, assign) BOOL enoughDataToPlay;
+@property (nonatomic, assign) BOOL hasPacketsToPlay;
 @end
 
 @implementation AEAudioStreamingLoaderOperation
@@ -89,7 +76,16 @@ OSStatus NJFillRawPacketData(AudioConverterRef               inAudioConverter,
 		self.URLSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
 
 		// Open file stream parser
-		checkResult(AudioFileStreamOpen((__bridge void *)(self), parserDidParseProperty, parserDidParsePacket,  0, &_audioFileStreamID), "Open file stream fail");
+		OSStatus status = AudioFileStreamOpen((__bridge void *)(self), parserDidParseProperty, parserDidParsePacket,  0, &_audioFileStreamID);
+
+		if (!checkResult(status, "AudioFileStreamOpen")) {
+			NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status
+											 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"Couldn't open file stream", @"")}];
+			if (self.didReceiveErrorBlock) {
+				self.didReceiveErrorBlock(error);
+				return self;
+			}
+		}
 
 		// Initialize array of packets
 		self.packetArray = [[NJPacketArray alloc] init];
@@ -115,9 +111,9 @@ OSStatus NJFillRawPacketData(AudioConverterRef               inAudioConverter,
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
-	self.error = error;
-	if (self.didFetchAllAudioData) {
-		self.didFetchAllAudioData(error);
+	if (self.didReceiveErrorBlock) {
+		self.didReceiveErrorBlock(error);
+		return;
 	}
 }
 
@@ -131,13 +127,22 @@ OSStatus NJFillRawPacketData(AudioConverterRef               inAudioConverter,
 
 - (void)ae_parseBytes:(NSData *)inData
 {
-	checkResult(AudioFileStreamParseBytes(self.audioFileStreamID, inData.length, inData.bytes, 0), "Parse file stream fail");
+	OSStatus status = AudioFileStreamParseBytes(self.audioFileStreamID, (UInt32)inData.length, inData.bytes, 0);
+	if (!checkResult(status, "AudioFileStreamParseBytes")) {
+		NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status
+										 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"Couldn't parse audio data", @"")}];
+		if (self.didReceiveErrorBlock) {
+			self.didReceiveErrorBlock(error);
+			return;
+		}
+	}
 }
 
 #pragma mark - Converter
 
 - (void)ae_createConverterByASBD:(AudioStreamBasicDescription)inASBD
 {
+	self.asbdFromAudioStreaming = inASBD;
 	// create converter by ASBD
 	AudioStreamBasicDescription LPCMASBD = [AEAudioController interleaved16BitStereoAudioDescription];
 	AudioConverterNew(&inASBD, &LPCMASBD, &_converter);
@@ -158,14 +163,43 @@ OSStatus NJFillRawPacketData(AudioConverterRef               inAudioConverter,
 	}
 }
 
-- (AudioBufferList *)bufferList
+- (OSStatus)pullAudioData:(AudioBufferList *)inBufferList timestamp:(const AudioTimeStamp *)inTimeStamp frames:(UInt32)inNumberFrames;
 {
-	return _bufferList;
+	if (!self.enoughDataToPlay) {
+		return !noErr;
+	}
+	if (!self.hasPacketsToPlay) {
+		[self.packetArray reset];
+		if (self.didCompleteBlock) {
+			self.didCompleteBlock();
+		}
+		return noErr;
+	}
+	OSStatus status = AudioConverterFillComplexBuffer(self.converter, NJFillRawPacketData, (__bridge void *)(self), &inNumberFrames, self.bufferList, NULL);
+
+	if (!checkResult(status, "AudioConverterFillComplexBuffer")) {
+		[self.packetArray reset];
+		NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status
+									 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"Couldn't covert audio data", @"")}];
+		if (self.didReceiveErrorBlock) {
+			self.didReceiveErrorBlock(error);
+			return status;
+		}
+	}
+
+	if (noErr == status && inNumberFrames) {
+		inBufferList->mNumberBuffers = 1;
+		inBufferList->mBuffers[0].mNumberChannels = 2;
+		inBufferList->mBuffers[0].mDataByteSize = self.bufferList->mBuffers[0].mDataByteSize;
+		inBufferList->mBuffers[0].mData = self.bufferList->mBuffers[0].mData;
+		status = noErr;
+	}
+	return status;
 }
 
-- (void)pullAudioData:(const AudioTimeStamp *)inTimeStamp frames:(UInt32)inFrames audio:(AudioBufferList *)inBufferList
+- (BOOL)hasPacketsToPlay
 {
-	NJAURenderCallback((__bridge void *)(self), NULL, inTimeStamp, NULL, inFrames, inBufferList);
+	return self.packetArray.hasPacketsToPlay;
 }
 
 @end
@@ -181,15 +215,21 @@ void parserDidParseProperty (
 	if (inPropertyID == kAudioFileStreamProperty_DataFormat) {
 		AudioStreamBasicDescription audioStreamDescription;
 		UInt32 descriptionSize = sizeof(AudioStreamBasicDescription);
-		checkResult(AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &descriptionSize, &audioStreamDescription), "Get property fail");
+		OSStatus status = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &descriptionSize, &audioStreamDescription);
+
+		if (!checkResult(status, "AudioFileStreamGetProperty")) {
+			[self.packetArray reset];
+			NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status
+											 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"Couldn't get property", @"")}];
+			if (self.didReceiveErrorBlock) {
+				self.didReceiveErrorBlock(error);
+			}
+		}
 		[self ae_createConverterByASBD:audioStreamDescription];
 
 	}
 	else if (inPropertyID == kAudioFileStreamProperty_ReadyToProducePackets) {
 		self.enoughDataToPlay = YES;
-		if (self.didParseEnoughPacketsToPlay) {
-			self.didParseEnoughPacketsToPlay();
-		}
 	}
 }
 
@@ -211,8 +251,8 @@ OSStatus NJFillRawPacketData(AudioConverterRef               inAudioConverter,
 							 AudioStreamPacketDescription**  outDataPacketDescription,
 							 void*                           inUserData)
 {
-	AEAudioStreamingLoaderOperation *audioDataProvider = (__bridge AEAudioStreamingLoaderOperation *)inUserData;
-	NJAudioPacketInfo *packetInfo = [audioDataProvider.packetArray readNextPacket];
+	AEAudioStreamingLoaderOperation *operation = (__bridge AEAudioStreamingLoaderOperation *)inUserData;
+	NJAudioPacketInfo *packetInfo = [operation.packetArray readNextPacket];
 	ioData->mNumberBuffers = 1;
 	ioData->mBuffers[0].mDataByteSize = packetInfo->packetDescription.mDataByteSize;
 	ioData->mBuffers[0].mData = packetInfo->data;
@@ -224,27 +264,9 @@ OSStatus NJFillRawPacketData(AudioConverterRef               inAudioConverter,
 	aspdesc.mDataByteSize = length;
 	aspdesc.mStartOffset = 0;
 	aspdesc.mVariableFramesInPacket = 1;
-	return noErr;
-}
-
-OSStatus NJAURenderCallback(void *							inRefCon,
-							AudioUnitRenderActionFlags *	ioActionFlags,
-							const AudioTimeStamp *			inTimeStamp,
-							UInt32							inBusNumber,
-							UInt32							inNumberFrames,
-							AudioBufferList *				ioData)
-{
-	AEAudioStreamingLoaderOperation *audioDataProvider = (__bridge AEAudioStreamingLoaderOperation *)(inRefCon);
-	OSStatus status = AudioConverterFillComplexBuffer(audioDataProvider.converter, NJFillRawPacketData, (__bridge void *)(audioDataProvider), &inNumberFrames, audioDataProvider.bufferList, NULL);
-	checkResult(status, "");
-	if (noErr == status && inNumberFrames) {
-		ioData->mNumberBuffers = 1;
-		ioData->mBuffers[0].mNumberChannels = 2;
-		ioData->mBuffers[0].mDataByteSize = audioDataProvider.bufferList->mBuffers[0].mDataByteSize;
-		ioData->mBuffers[0].mData = audioDataProvider.bufferList->mBuffers[0].mData;
-#warning why?
-		//		player->renderAudioBufferList->mBuffers[0].mDataByteSize = player->renderBufferSize;
-		status = noErr;
+	if (operation.didUpdateCurrentPlaybackTimeBlock) {
+		assert(operation.asbdFromAudioStreaming.mFramesPerPacket > 0);
+		operation.didUpdateCurrentPlaybackTimeBlock(operation.packetArray.packetReadIndex * operation.asbdFromAudioStreaming.mFramesPerPacket / operation.asbdFromAudioStreaming.mSampleRate);
 	}
-	return status;
+	return noErr;
 }

@@ -14,44 +14,25 @@
  - Saves LPCM into AudioBuffer
  */
 
+/*
+ Error handling:
+ - error of network problems
+ - error of parsing packets
+ - error of convert packets
+ */
+
+/*
+ Check code running on which thread
+ - 
+ - 
+ */
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 
-/*
- Problems
- - How to handle error of parsing audio data?
- */
-
 @interface AEAudioStreamingLoaderOperation : NSOperation
 - (instancetype)initWithURL:(NSURL *)inURL;
-- (void)pullAudioData:(const AudioTimeStamp *)inTimeStamp frames:(UInt32)inFrames audio:(AudioBufferList *)inBufferList;
-/*!
- * A block to use to receive audio
- *
- *  If this is set, then audio will be provided via this block as it is
- *  loaded, instead of stored within @link bufferList @endlink.
- */
-@property (nonatomic, copy) void (^audioReceiverBlock)(AudioBufferList *audio, UInt32 lengthInFrames);
-
-@property (nonatomic, copy) void (^completedBlock)();
-
-
-/*!
- * The loaded audio, once operation has completed, unless @link audioReceiverBlock @endlink is set.
- *
- *  You are responsible for freeing both the memory pointed to by each mData pointer,
- *  as well as the buffer list itself. If an error occurred, this will be NULL.
- */
-@property (nonatomic, readonly) AudioBufferList *bufferList;
-
-/*!
- * The length of the audio file
- */
-@property (nonatomic, readonly) UInt32 lengthInFrames;
-
-/*!
- * The error, if one occurred
- */
-@property (nonatomic, strong, readonly) NSError *error;
-@property (nonatomic, assign, readonly) BOOL enoughDataToPlay;
+- (OSStatus)pullAudioData:(AudioBufferList *)inBufferList timestamp:(const AudioTimeStamp *)inTimeStamp frames:(UInt32)inFrames;
+@property (nonatomic, copy) void (^didCompleteBlock)();
+@property (nonatomic, copy) void (^didReceiveErrorBlock)();
+@property (nonatomic, copy) void (^didUpdateCurrentPlaybackTimeBlock)(NSTimeInterval time);
 @end

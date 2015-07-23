@@ -54,4 +54,17 @@
     bzero((void *)self.packets + oldSize, oldSize);
 }
 
+- (BOOL)hasPacketsToPlay
+{
+	return self.packetWriteIndex > self.packetReadIndex;
+}
+
+- (void)reset
+{
+	free(self.packets);
+	self.maxPacketCount = 2048;
+	self.packetReadIndex = 0;
+	self.packetWriteIndex = 0;
+	self.packets = (NJAudioPacketInfo *)calloc(self.maxPacketCount, sizeof(NJAudioPacketInfo));
+}
 @end
