@@ -16,6 +16,7 @@
 }
 @property (nonatomic, strong, readwrite) NSURL *url;
 @property (nonatomic, strong) AEAudioStreamingLoaderOperation *audioStreamingLoaderOperation;
+@property (nonatomic, strong) AEAudioController *audioController;
 @end
 
 @implementation AEStreamingPlayer
@@ -28,24 +29,31 @@
 	player->_volume = 1.0;
 	player->_channelIsPlaying = YES;
 	player.url = url;
+	player.audioController = audioController;
+	[player createAndStartOperaion];
+	return player;
+}
 
-	AEAudioStreamingLoaderOperation *operation = [[AEAudioStreamingLoaderOperation alloc] initWithURL:url];
-	player.audioStreamingLoaderOperation = operation;
+- (void)createAndStartOperaion
+{
+	__weak AEStreamingPlayer *weakSelf = self;
+	AEAudioStreamingLoaderOperation *operation = [[AEAudioStreamingLoaderOperation alloc] initWithURL:self.url];
+	self.audioStreamingLoaderOperation = operation;
 
 #warning check the retain cycle problems in block
 	__block AEAudioStreamingLoaderOperation *weakOperation = operation;
-
 	operation.didCompleteBlock = ^(){
 		// Reached the end of the audio - either loop, or stop
-		if ( player.loop ) {
-			if ( player.startLoopBlock ) {
+		if ( weakSelf.loop ) {
+			[weakSelf replay];
+			if ( weakSelf.startLoopBlock ) {
 				// Notify main thread that the loop playback has restarted
-				AEAudioControllerSendAsynchronousMessageToMainThread(audioController, notifyLoopRestart, (__bridge void *)(player), sizeof(AEStreamingPlayer*));
+				AEAudioControllerSendAsynchronousMessageToMainThread(self.audioController, notifyLoopRestart, (__bridge void *)(weakSelf), sizeof(AEStreamingPlayer*));
 			}
 		} else {
 			// Notify main thread that playback has finished
-			AEAudioControllerSendAsynchronousMessageToMainThread(audioController, notifyPlaybackStopped, (__bridge void *)(player), sizeof(AEStreamingPlayer*));
-			player.channelIsPlaying = NO;
+			AEAudioControllerSendAsynchronousMessageToMainThread(self.audioController, notifyPlaybackStopped, (__bridge void *)(weakSelf), sizeof(AEStreamingPlayer*));
+			weakSelf.channelIsPlaying = NO;
 		}
 		[weakOperation cancel];
 		weakOperation = nil;
@@ -55,10 +63,9 @@
 		weakOperation = nil;
 	};
 	operation.didUpdateCurrentPlaybackTimeBlock = ^(NSTimeInterval inPlaybackTime){
-//		NSLog(@"%@", @(inPlaybackTime));
+		//		NSLog(@"%@", @(inPlaybackTime));
 	};
 	[operation start];
-	return player;
 }
 
 - (void)dealloc {
@@ -72,12 +79,7 @@
 
 - (void)replay
 {
-	AEAudioStreamingLoaderOperation *operation = [[AEAudioStreamingLoaderOperation alloc] initWithURL:_url];
-	if (self.audioStreamingLoaderOperation) {
-		[self.audioStreamingLoaderOperation cancel];
-		self.audioStreamingLoaderOperation = nil;
-	}
-	self.audioStreamingLoaderOperation = operation;
+	[self createAndStartOperaion];
 }
 
 static void notifyLoopRestart(AEAudioController *audioController, void *userInfo, int length) {
